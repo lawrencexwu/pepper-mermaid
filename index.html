@@ -20,6 +20,7 @@
             background-color: #f0f2f5; 
             margin: 0; 
             padding: 10px; 
+            overflow-x: hidden;
         }
 
         @keyframes matrixRain {
@@ -103,6 +104,61 @@
     </div>
 
     <script type="text/babel">
+        const generateRandomText = () => {
+            const subjects = [
+                "The quick brown fox", "A skilled programmer", "The dedicated student",
+                "An efficient worker", "The focused learner", "Time management",
+                "Regular practice", "Consistent effort", "The determined writer",
+                "A daily routine", "Keyboard mastery", "Touch typing", "Proper posture",
+                "The experienced typist", "Careful attention"
+            ];
+            
+            const verbs = [
+                "improves", "enhances", "develops", "strengthens", "accelerates",
+                "transforms", "optimizes", "refines", "cultivates", "maximizes",
+                "boosts", "increases", "amplifies", "elevates", "perfects"
+            ];
+            
+            const objects = [
+                "typing speed", "keyboard skills", "muscle memory", "typing accuracy",
+                "productivity levels", "working efficiency", "learning progress",
+                "performance metrics", "technical abilities", "daily output",
+                "writing quality", "typing precision", "workflow speed",
+                "error reduction", "typing confidence"
+            ];
+            
+            const connectors = [
+                "while", "as", "when", "although", "because", "since",
+                "whenever", "if", "unless", "before", "after", "and",
+                "but", "so", "therefore"
+            ];
+            
+            const secondParts = [
+                "maintaining high accuracy",
+                "focusing on proper technique",
+                "developing good habits",
+                "staying consistent with practice",
+                "paying attention to detail",
+                "working on speed and precision",
+                "building muscle memory",
+                "keeping a steady rhythm",
+                "minimizing errors",
+                "maximizing efficiency",
+                "improving finger placement",
+                "maintaining proper form",
+                "reducing typing mistakes",
+                "increasing typing speed",
+                "developing better coordination"
+            ];
+
+            const getRandomItem = (array) => array[Math.floor(Math.random() * array.length)];
+            
+            const sentence1 = `${getRandomItem(subjects)} ${getRandomItem(verbs)} ${getRandomItem(objects)}`;
+            const sentence2 = `${getRandomItem(connectors)} ${getRandomItem(secondParts)}.`;
+            
+            return `${sentence1}, ${sentence2}`;
+        };
+
         const TypingTutor = () => {
             const [currentText, setCurrentText] = React.useState('');
             const [userInput, setUserInput] = React.useState('');
@@ -118,20 +174,8 @@
                 completedTexts: 0
             });
 
-            const paragraphs = [
-                "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the English alphabet at least once.",
-                "Learning to type efficiently is a valuable skill in today's digital world. With practice, your speed will increase.",
-                "While watching YouTube videos, you can improve your typing skills. This is a great way to multitask.",
-                "Technology continues to shape how we work and communicate. Typing quickly and accurately is important.",
-                "The best way to improve at anything is through consistent practice. Small improvements add up over time."
-            ];
-
-            const getRandomParagraph = () => {
-                return paragraphs[Math.floor(Math.random() * paragraphs.length)];
-            };
-
             React.useEffect(() => {
-                setCurrentText(getRandomParagraph());
+                setCurrentText(generateRandomText());
             }, []);
 
             const calculateTimeDelta = () => {
@@ -181,7 +225,7 @@
                     triggerMatrixEffect();
                     setTimeout(() => {
                         setUserInput('');
-                        setCurrentText(getRandomParagraph());
+                        setCurrentText(generateRandomText());
                         setStartTime(null);
                         setPausedTime(0);
                         setLastPauseTime(null);
@@ -207,7 +251,7 @@
 
             const reset = () => {
                 setUserInput('');
-                setCurrentText(getRandomParagraph());
+                setCurrentText(generateRandomText());
                 setStartTime(null);
                 setPausedTime(0);
                 setLastPauseTime(null);
@@ -241,6 +285,9 @@
                 return parts;
             };
 
+            // Calculate progress percentage
+            const progress = (userInput.length / currentText.length) * 100;
+
             return (
                 <div>
                     {/* Compact Stats Bar - Mobile Responsive */}
@@ -266,55 +313,19 @@
                         </div>
                     </div>
 
-                    {/* Text Display Area with Matrix Effect */}
+                    {/* Progress Bar */}
+                    <div className="h-1 bg-gray-200 rounded mb-2">
+                        <div 
+                            className="h-full bg-blue-500 rounded transition-all duration-200"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+
+                    {/* Text Display Area */}
                     <div className="relative mb-2 p-3 bg-gray-50 rounded text-base sm:text-lg">
                         <p className="font-mono leading-relaxed">
                             {renderText()}
                         </p>
-                        
-                        {/* Matrix Animation */}
-                        {showMatrix && (
-                            <div className="absolute inset-0" style={{ perspective: '1000px' }}>
-                                {/* Flash effect */}
-                                <div 
-                                    className="absolute inset-0 bg-green-500"
-                                    style={{ 
-                                        animation: 'flash 1s linear forwards',
-                                        opacity: 0
-                                    }}
-                                />
-                                
-                                {/* Multiple layers of rain */}
-                                {[...Array(30)].map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className="matrix-rain"
-                                        style={{
-                                            left: `${(i * 3.33)}%`,
-                                            height: '200%',
-                                            opacity: Math.random() * 0.5 + 0.5,
-                                            animation: `matrixRain ${1 + Math.random() * 0.5}s linear forwards`,
-                                            animationDelay: `${Math.random() * 0.5}s`
-                                        }}
-                                    />
-                                ))}
-
-                                {/* Random Matrix characters */}
-                                {[...Array(50)].map((_, i) => (
-                                    <div
-                                        key={`char-${i}`}
-                                        className="matrix-char"
-                                        style={{
-                                            left: `${Math.random() * 100}%`,
-                                            top: `${Math.random() * 100}%`,
-                                            transform: 'scale(1.5)'
-                                        }}
-                                    >
-                                        {String.fromCharCode(0x30A0 + Math.random() * 96)}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* Input Area - Mobile Responsive */}
@@ -328,6 +339,47 @@
                         rows={3}
                         autoFocus
                     />
+
+                    {/* Matrix Effect */}
+                    {showMatrix && (
+                        <div className="fixed inset-0 z-50" style={{ perspective: '1000px' }}>
+                            <div 
+                                className="absolute inset-0 bg-green-500"
+                                style={{ 
+                                    animation: 'flash 1s linear forwards',
+                                    opacity: 0
+                                }}
+                            />
+                            
+                            {[...Array(50)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="matrix-rain"
+                                    style={{
+                                        left: `${(i * 2)}%`,
+                                        height: '200%',
+                                        opacity: Math.random() * 0.5 + 0.5,
+                                        animation: `matrixRain ${1 + Math.random() * 0.5}s linear forwards`,
+                                        animationDelay: `${Math.random() * 0.5}s`
+                                    }}
+                                />
+                            ))}
+
+                            {[...Array(100)].map((_, i) => (
+                                <div
+                                    key={`char-${i}`}
+                                    className="matrix-char"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        transform: 'scale(1.5)'
+                                    }}
+                                >
+                                    {String.fromCharCode(0x30A0 + Math.random() * 96)}
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {isPaused && (
                         <div className="mt-1 text-xs text-blue-600">
