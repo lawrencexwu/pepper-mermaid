@@ -16,19 +16,74 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        body { background-color: #f0f2f5; margin: 0; padding: 10px; }
+        body { 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 10px; 
+        }
+
+        @keyframes matrixRain {
+            0% { transform: translateY(-100%); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            30% { opacity: 0; }
+            40% { opacity: 0.7; }
+            50% { opacity: 0; }
+            60% { opacity: 0.4; }
+            70% { opacity: 0; }
+            80% { opacity: 0.2; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .matrix-rain {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, 
+                rgba(0,255,0,0) 0%, 
+                #0f0 20%, 
+                #0f0 80%, 
+                rgba(0,255,0,0) 100%
+            );
+        }
+
+        .matrix-char {
+            position: absolute;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 14px;
+            text-shadow: 0 0 8px #0f0;
+            animation: fadeOut 0.5s linear forwards;
+            animation-delay: 1.5s;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 5px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="max-w-3xl mx-auto">
         <!-- Compact Header with Side Ad -->
-        <div class="flex gap-2 mb-2">
+        <div class="flex flex-col sm:flex-row gap-2 mb-2">
             <div class="flex-1">
                 <h1 class="text-lg font-bold">YouTube Typing Practice</h1>
                 <p class="text-sm text-gray-600">Type to practice while watching videos!</p>
             </div>
             <!-- AdSense Ad Unit -->
-            <div class="w-[300px] h-[50px]">
+            <div class="w-full sm:w-[300px] h-[50px]">
                 <ins class="adsbygoogle"
                      style="display:block"
                      data-ad-client="ca-pub-2542902506864184"
@@ -55,6 +110,7 @@
             const [startTime, setStartTime] = React.useState(null);
             const [pausedTime, setPausedTime] = React.useState(0);
             const [lastPauseTime, setLastPauseTime] = React.useState(null);
+            const [showMatrix, setShowMatrix] = React.useState(false);
             const [stats, setStats] = React.useState({
                 wpm: 0,
                 accuracy: 100,
@@ -70,7 +126,9 @@
                 "The best way to improve at anything is through consistent practice. Small improvements add up over time."
             ];
 
-            const getRandomParagraph = () => paragraphs[Math.floor(Math.random() * paragraphs.length)];
+            const getRandomParagraph = () => {
+                return paragraphs[Math.floor(Math.random() * paragraphs.length)];
+            };
 
             React.useEffect(() => {
                 setCurrentText(getRandomParagraph());
@@ -81,6 +139,11 @@
                 const now = Date.now();
                 const totalPausedTime = pausedTime + (lastPauseTime ? now - lastPauseTime : 0);
                 return (now - startTime - (isPaused ? totalPausedTime : pausedTime)) / 1000 / 60;
+            };
+
+            const triggerMatrixEffect = () => {
+                setShowMatrix(true);
+                setTimeout(() => setShowMatrix(false), 2000);
             };
 
             const handleInput = (e) => {
@@ -115,15 +178,18 @@
                 }));
 
                 if (input === currentText) {
-                    setUserInput('');
-                    setCurrentText(getRandomParagraph());
-                    setStartTime(null);
-                    setPausedTime(0);
-                    setLastPauseTime(null);
-                    setStats(prev => ({
-                        ...prev,
-                        completedTexts: prev.completedTexts + 1
-                    }));
+                    triggerMatrixEffect();
+                    setTimeout(() => {
+                        setUserInput('');
+                        setCurrentText(getRandomParagraph());
+                        setStartTime(null);
+                        setPausedTime(0);
+                        setLastPauseTime(null);
+                        setStats(prev => ({
+                            ...prev,
+                            completedTexts: prev.completedTexts + 1
+                        }));
+                    }, 1500);
                 }
             };
 
@@ -146,6 +212,7 @@
                 setPausedTime(0);
                 setLastPauseTime(null);
                 setIsPaused(false);
+                setShowMatrix(false);
                 setStats({
                     wpm: 0,
                     accuracy: 100,
@@ -176,45 +243,89 @@
 
             return (
                 <div>
-                    {/* Compact Stats Bar */}
-                    <div class="flex justify-between text-sm mb-2">
-                        <div class="flex gap-4">
+                    {/* Compact Stats Bar - Mobile Responsive */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm mb-2 gap-2">
+                        <div className="flex flex-wrap gap-4">
                             <span>WPM: <strong>{stats.wpm}</strong></span>
                             <span>Accuracy: <strong>{stats.accuracy}%</strong></span>
                             <span>Errors: <strong>{stats.errors}</strong></span>
                         </div>
-                        <div class="flex gap-2">
+                        <div className="flex gap-2">
                             <button
                                 onClick={togglePause}
-                                className="px-2 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                                className="px-4 py-2 sm:px-2 sm:py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-sm"
                             >
                                 {isPaused ? 'Resume' : 'Pause'}
                             </button>
                             <button
                                 onClick={reset}
-                                className="px-2 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
+                                className="px-4 py-2 sm:px-2 sm:py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-base sm:text-sm"
                             >
                                 Reset
                             </button>
                         </div>
                     </div>
 
-                    {/* Text Display Area */}
-                    <div className="mb-2 p-2 bg-gray-100 rounded text-sm">
-                        <p className="font-mono leading-snug">
+                    {/* Text Display Area with Matrix Effect */}
+                    <div className="relative mb-2 p-3 bg-gray-50 rounded text-base sm:text-lg">
+                        <p className="font-mono leading-relaxed">
                             {renderText()}
                         </p>
+                        
+                        {/* Matrix Animation */}
+                        {showMatrix && (
+                            <div className="absolute inset-0" style={{ perspective: '1000px' }}>
+                                {/* Flash effect */}
+                                <div 
+                                    className="absolute inset-0 bg-green-500"
+                                    style={{ 
+                                        animation: 'flash 1s linear forwards',
+                                        opacity: 0
+                                    }}
+                                />
+                                
+                                {/* Multiple layers of rain */}
+                                {[...Array(30)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="matrix-rain"
+                                        style={{
+                                            left: `${(i * 3.33)}%`,
+                                            height: '200%',
+                                            opacity: Math.random() * 0.5 + 0.5,
+                                            animation: `matrixRain ${1 + Math.random() * 0.5}s linear forwards`,
+                                            animationDelay: `${Math.random() * 0.5}s`
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Random Matrix characters */}
+                                {[...Array(50)].map((_, i) => (
+                                    <div
+                                        key={`char-${i}`}
+                                        className="matrix-char"
+                                        style={{
+                                            left: `${Math.random() * 100}%`,
+                                            top: `${Math.random() * 100}%`,
+                                            transform: 'scale(1.5)'
+                                        }}
+                                    >
+                                        {String.fromCharCode(0x30A0 + Math.random() * 96)}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Input Area */}
+                    {/* Input Area - Mobile Responsive */}
                     <textarea
                         value={userInput}
                         onChange={handleInput}
                         disabled={isPaused}
-                        className={`w-full p-2 border rounded font-mono text-sm ${
+                        className={`w-full p-3 border rounded font-mono text-base sm:text-lg ${
                             isPaused ? 'bg-gray-100' : ''
                         }`}
-                        rows={2}
+                        rows={3}
                         autoFocus
                     />
 
