@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Typing Practice</title>
+    
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { background-color: #f0f2f5; }
+        .app-container { max-width: 800px; margin: 20px auto; padding: 0 20px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <h1 class="text-2xl font-bold mb-3">YouTube Typing Practice</h1>
+            <p class="mb-2">💡 <strong>How to use:</strong></p>
+            <ol class="list-decimal ml-5 space-y-1">
+                <li>Open your YouTube video in another window</li>
+                <li>Resize and arrange both windows so you can see both</li>
+                <li>Practice typing while watching your video!</li>
+            </ol>
+        </div>
+        <div id="root"></div>
+    </div>
+
+    <script type="text/babel">
+        const TypingTutor = () => {
+            const [currentText, setCurrentText] = React.useState('');
+            const [userInput, setUserInput] = React.useState('');
+            const [isPaused, setIsPaused] = React.useState(false);
+            const [startTime, setStartTime] = React.useState(null);
+            const [pausedTime, setPausedTime] = React.useState(0);
+            const [lastPauseTime, setLastPauseTime] = React.useState(null);
+            const [stats, setStats] = React.useState({
+                wpm: 0,
+                accuracy: 100,
+                errors: 0,
+                completedTexts: 0
+            });
+
+            const paragraphs = [
+                "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the English alphabet at least once. Practice makes perfect!",
+                "Learning to type efficiently is a valuable skill in today's digital world. With practice, your speed and accuracy will naturally increase over time.",
+                "While watching YouTube videos, you can improve your typing skills. This is a great way to make productive use of your entertainment time.",
+                "Technology continues to shape how we work and communicate. Typing quickly and accurately is becoming increasingly important in our digital age.",
+                "The best way to improve at anything is through consistent practice. Small improvements each day add up to significant progress over time.",
+                "Regular practice sessions, even if short, can lead to substantial improvements in your typing speed and accuracy over time.",
+                "Developing good typing habits early will save you countless hours in the future. Focus on accuracy first, then speed will naturally follow.",
+                "Effective multitasking involves finding ways to combine different activities. Practicing typing while watching videos is a perfect example.",
+                "Your brain can process multiple streams of information simultaneously. This makes it possible to improve skills while enjoying content.",
+                "Remember to maintain good posture while typing. Keep your wrists elevated and your back straight to prevent strain during long sessions."
+            ];
+
+            const getRandomParagraph = () => paragraphs[Math.floor(Math.random() * paragraphs.length)];
+
+            React.useEffect(() => {
+                setCurrentText(getRandomParagraph());
+            }, []);
+
+            const calculateTimeDelta = () => {
+                if (!startTime) return 0;
+                const now = Date.now();
+                const totalPausedTime = pausedTime + (lastPauseTime ? now - lastPauseTime : 0);
+                return (now - startTime - (isPaused ? totalPausedTime : pausedTime)) / 1000 / 60;
+            };
+
+            const handleInput = (e) => {
+                if (isPaused) return;
+                
+                const input = e.target.value;
+                setUserInput(input);
+
+                if (!startTime && input) {
+                    setStartTime(Date.now());
+                }
+
+                let errors = 0;
+                for (let i = 0; i < input.length; i++) {
+                    if (input[i] !== currentText[i]) errors++;
+                }
+
+                const accuracy = input.length > 0 
+                    ? ((input.length - errors) / input.length * 100).toFixed(1)
+                    : 100;
+
+                const timeElapsed = calculateTimeDelta();
+                const wpm = timeElapsed > 0
+                    ? Math.round((input.length / 5) / timeElapsed)
+                    : 0;
+
+                setStats(prev => ({
+                    ...prev,
+                    wpm,
+                    accuracy,
+                    errors
+                }));
+
+                if (input === currentText) {
+                    setUserInput('');
+                    setCurrentText(getRandomParagraph());
+                    setStartTime(null);
+                    setPausedTime(0);
+                    setLastPauseTime(null);
+                    setStats(prev => ({
+                        ...prev,
+                        completedTexts: prev.completedTexts + 1
+                    }));
+                }
+            };
+
+            const togglePause = () => {
+                setIsPaused(prev => {
+                    if (!prev) {
+                        setLastPauseTime(Date.now());
+                    } else {
+                        setPausedTime(prev => prev + (Date.now() - lastPauseTime));
+                        setLastPauseTime(null);
+                    }
+                    return !prev;
+                });
+            };
+
+            const reset = () => {
+                setUserInput('');
+                setCurrentText(getRandomParagraph());
+                setStartTime(null);
+                setPausedTime(0);
+                setLastPauseTime(null);
+                setIsPaused(false);
+                setStats({
+                    wpm: 0,
+                    accuracy: 100,
+                    errors: 0,
+                    completedTexts: 0
+                });
+            };
+
+            const renderText = () => {
+                const parts = [];
+                for (let i = 0; i < Math.max(currentText.length, userInput.length); i++) {
+                    if (i < userInput.length) {
+                        if (currentText[i] === userInput[i]) {
+                            parts.push(<span key={i} className="text-green-600">{currentText[i]}</span>);
+                        } else {
+                            parts.push(
+                                <span key={i} className="text-red-600 bg-red-100">
+                                    {currentText[i] || ' '}
+                                </span>
+                            );
+                        }
+                    } else {
+                        parts.push(<span key={i}>{currentText[i]}</span>);
+                    }
+                }
+                return parts;
+            };
+
+            return (
+                <div className="p-4 bg-white rounded-lg shadow-sm">
+                    <div className="mb-4 flex flex-wrap justify-between items-center gap-4">
+                        <h2 className="text-2xl font-bold">Typing Practice</h2>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={togglePause}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                {isPaused ? 'Resume' : 'Pause'}
+                            </button>
+                            <button
+                                onClick={reset}
+                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div className="p-2 bg-gray-100 rounded text-center">
+                            <div className="text-sm text-gray-500">WPM</div>
+                            <div className="text-lg font-bold">{stats.wpm}</div>
+                        </div>
+                        <div className="p-2 bg-gray-100 rounded text-center">
+                            <div className="text-sm text-gray-500">Accuracy</div>
+                            <div className="text-lg font-bold">{stats.accuracy}%</div>
+                        </div>
+                        <div className="p-2 bg-gray-100 rounded text-center">
+                            <div className="text-sm text-gray-500">Errors</div>
+                            <div className="text-lg font-bold">{stats.errors}</div>
+                        </div>
+                        <div className="p-2 bg-gray-100 rounded text-center">
+                            <div className="text-sm text-gray-500">Completed</div>
+                            <div className="text-lg font-bold">{stats.completedTexts}</div>
+                        </div>
+                    </div>
+
+                    <div className="mb-4 p-4 bg-gray-100 rounded">
+                        <p className="text-lg font-mono leading-relaxed whitespace-pre-wrap">
+                            {renderText()}
+                        </p>
+                    </div>
+
+                    <textarea
+                        value={userInput}
+                        onChange={handleInput}
+                        disabled={isPaused}
+                        className={`w-full p-2 border rounded font-mono text-lg ${
+                            isPaused ? 'bg-gray-100' : ''
+                        }`}
+                        rows={3}
+                        autoFocus
+                    />
+
+                    {isPaused && (
+                        <div className="mt-2 p-2 bg-blue-100 text-blue-800 rounded">
+                            Practice paused - press Resume to continue
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TypingTutor />);
+    </script>
+</body>
+</html>
