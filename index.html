@@ -10,80 +10,70 @@
      crossorigin="anonymous"></script>
     
     <!-- Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        body { 
-            background-color: #f0f2f5; 
-            margin: 0; 
-            padding: 10px; 
-            overflow-x: hidden;
-        }
-
-        @keyframes matrixRain {
-            0% { transform: translateY(-100%); opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { transform: translateY(100%); opacity: 0; }
-        }
-
-        @keyframes flash {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            30% { opacity: 0; }
-            40% { opacity: 0.7; }
-            50% { opacity: 0; }
-            60% { opacity: 0.4; }
-            70% { opacity: 0; }
-            80% { opacity: 0.2; }
-            100% { opacity: 0; }
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
         .matrix-rain {
             position: absolute;
             width: 2px;
             background: linear-gradient(180deg, 
-                rgba(0,255,0,0) 0%, 
-                #0f0 20%, 
-                #0f0 80%, 
-                rgba(0,255,0,0) 100%
+                rgba(0, 255, 0, 0) 0%,
+                rgba(0, 255, 0, 0.8) 50%,
+                rgba(0, 255, 0, 0) 100%
             );
+            filter: drop-shadow(0 0 2px #0f0);
+            animation: rain 0.8s linear forwards;
         }
 
         .matrix-char {
             position: absolute;
             color: #0f0;
-            font-family: monospace;
-            font-size: 14px;
             text-shadow: 0 0 8px #0f0;
-            animation: fadeOut 0.5s linear forwards;
-            animation-delay: 1.5s;
+            font-family: monospace;
+            font-size: 16px;
+            animation: fade 1s linear forwards;
         }
 
-        @media (max-width: 640px) {
-            body {
-                padding: 5px;
-            }
+        @keyframes rain {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100%); }
+        }
+
+        @keyframes fade {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .text-area {
+            min-height: 120px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            transition: width 0.2s ease-out;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 p-4">
     <div class="max-w-3xl mx-auto">
-        <!-- Compact Header with Side Ad -->
+        <!-- AdSense Ad Unit -->
         <div class="flex flex-col sm:flex-row gap-2 mb-2">
             <div class="flex-1">
                 <h1 class="text-lg font-bold">YouTube Typing Practice</h1>
                 <p class="text-sm text-gray-600">Type to practice while watching videos!</p>
             </div>
-            <!-- AdSense Ad Unit -->
             <div class="w-full sm:w-[300px] h-[50px]">
                 <ins class="adsbygoogle"
                      style="display:block"
@@ -97,282 +87,324 @@
             </div>
         </div>
 
-        <!-- Main Content Area -->
+        <!-- Main Content -->
         <div class="bg-white rounded shadow-sm p-3">
             <div id="root"></div>
         </div>
     </div>
 
     <script type="text/babel">
-        const generateRandomText = () => {
-            const subjects = [
-                "The quick brown fox", "A skilled programmer", "The dedicated student",
-                "An efficient worker", "The focused learner", "Time management",
-                "Regular practice", "Consistent effort", "The determined writer",
-                "A daily routine", "Keyboard mastery", "Touch typing", "Proper posture",
-                "The experienced typist", "Careful attention"
-            ];
-            
-            const verbs = [
-                "improves", "enhances", "develops", "strengthens", "accelerates",
-                "transforms", "optimizes", "refines", "cultivates", "maximizes",
-                "boosts", "increases", "amplifies", "elevates", "perfects"
-            ];
-            
-            const objects = [
-                "typing speed", "keyboard skills", "muscle memory", "typing accuracy",
-                "productivity levels", "working efficiency", "learning progress",
-                "performance metrics", "technical abilities", "daily output",
-                "writing quality", "typing precision", "workflow speed",
-                "error reduction", "typing confidence"
-            ];
-            
-            const connectors = [
-                "while", "as", "when", "although", "because", "since",
-                "whenever", "if", "unless", "before", "after", "and",
-                "but", "so", "therefore"
-            ];
-            
-            const secondParts = [
-                "maintaining high accuracy",
-                "focusing on proper technique",
-                "developing good habits",
-                "staying consistent with practice",
-                "paying attention to detail",
-                "working on speed and precision",
-                "building muscle memory",
-                "keeping a steady rhythm",
-                "minimizing errors",
-                "maximizing efficiency",
-                "improving finger placement",
-                "maintaining proper form",
-                "reducing typing mistakes",
-                "increasing typing speed",
-                "developing better coordination"
-            ];
-
-            const getRandomItem = (array) => array[Math.floor(Math.random() * array.length)];
-            
-            const sentence1 = `${getRandomItem(subjects)} ${getRandomItem(verbs)} ${getRandomItem(objects)}`;
-            const sentence2 = `${getRandomItem(connectors)} ${getRandomItem(secondParts)}.`;
-            
-            return `${sentence1}, ${sentence2}`;
-        };
-
         const TypingTutor = () => {
-            const [currentText, setCurrentText] = React.useState('');
-            const [userInput, setUserInput] = React.useState('');
-            const [isPaused, setIsPaused] = React.useState(false);
+            const [text, setText] = React.useState('');
+            const [input, setInput] = React.useState('');
             const [startTime, setStartTime] = React.useState(null);
-            const [pausedTime, setPausedTime] = React.useState(0);
-            const [lastPauseTime, setLastPauseTime] = React.useState(null);
-            const [showMatrix, setShowMatrix] = React.useState(false);
+            const [isFinished, setIsFinished] = React.useState(false);
+            const [showEffect, setShowEffect] = React.useState(false);
+            const [showStats, setShowStats] = React.useState(false);
             const [stats, setStats] = React.useState({
                 wpm: 0,
-                accuracy: 100,
                 errors: 0,
-                completedTexts: 0
+                keystrokes: 0,
+                completed: 0,
+                wpmHistory: [],
+                errorMap: {}
             });
 
+            const texts = [
+                "The quantum physicist's cat walked into a bar, or did it? Nobody was sure until they looked.",
+                "Error 404: Motivation not found. Please try again after coffee.",
+                "Time travelers' meeting postponed. Please arrive before you left.",
+                "The optimist sees the glass half full. The programmer sees a buffer overflow.",
+                "My code doesn't work, I have no idea why. My code works, I have no idea why.",
+                "Why did the programmer quit his job? He didn't get arrays.",
+                "The code was perfect, said no one ever.",
+                "In a world of AI, the human touch still debugs the bugs.",
+		"The only thing worse than a bug is a bug that works.",
+		"I told my computer to go to sleep, but it wanted to update first.",
+		"The best thing about boolean jokes? Even if they're bad, they're still true.",
+		"There are 10 types of people in this world: those who understand binary and those who don't.",
+		"Real programmers count from zero, except on their fingers.",
+		"Git commit -m 'Fixed bugs' ... Git push ... Prayer mode activated.",
+		"Documentation is like true love - it exists, but it's hard to find.",
+		"The coffee machine is broken. Programmer productivity drops to zero.",
+		"Debugging is like being the detective in a crime movie where you're also the murderer.",
+		"A SQL query walks into a bar, sees two tables, and asks, 'Can I join you?'",
+		"The best way to predict the future is to implement it.",
+		"Keep calm and blame it on the cache.",
+		"Keyboard not found. Press F1 to continue, or F2 to quit.",
+		"Life is short, use Python (unless you need speed, then use C++).",
+		"The problem with troubleshooting is that real trouble shoots back.",
+		"Always code as if the person who ends up maintaining your code is a violent psychopath who knows where you live.",
+		"If debugging is the process of removing bugs, then programming must be the process of adding them.",
+		"Never trust a computer you can't throw out a window.",
+		"To understand recursion, you must first understand recursion.",
+		"The best performance improvement is choosing the right algorithm.",
+		"In theory, there is no difference between theory and practice. In practice, there is.",
+		"The more I C, the less I see."
+            ];
+
             React.useEffect(() => {
-                setCurrentText(generateRandomText());
+                setText(texts[Math.floor(Math.random() * texts.length)]);
             }, []);
 
-            const calculateTimeDelta = () => {
-                if (!startTime) return 0;
-                const now = Date.now();
-                const totalPausedTime = pausedTime + (lastPauseTime ? now - lastPauseTime : 0);
-                return (now - startTime - (isPaused ? totalPausedTime : pausedTime)) / 1000 / 60;
-            };
-
-            const triggerMatrixEffect = () => {
-                setShowMatrix(true);
-                setTimeout(() => setShowMatrix(false), 2000);
+            const calculateProgress = () => {
+                if (!text) return 0;
+                return (input.length / text.length) * 100;
             };
 
             const handleInput = (e) => {
-                if (isPaused) return;
+                if (isFinished) return;
                 
-                const input = e.target.value;
-                setUserInput(input);
+                const newInput = e.target.value;
+                if (!startTime && newInput) setStartTime(Date.now());
 
-                if (!startTime && input) {
-                    setStartTime(Date.now());
-                }
-
-                let errors = 0;
-                for (let i = 0; i < input.length; i++) {
-                    if (input[i] !== currentText[i]) errors++;
-                }
-
-                const accuracy = input.length > 0 
-                    ? ((input.length - errors) / input.length * 100).toFixed(1)
-                    : 100;
-
-                const timeElapsed = calculateTimeDelta();
-                const wpm = timeElapsed > 0
-                    ? Math.round((input.length / 5) / timeElapsed)
-                    : 0;
-
-                setStats(prev => ({
-                    ...prev,
-                    wpm,
-                    accuracy,
-                    errors
-                }));
-
-                if (input === currentText) {
-                    triggerMatrixEffect();
-                    setTimeout(() => {
-                        setUserInput('');
-                        setCurrentText(generateRandomText());
-                        setStartTime(null);
-                        setPausedTime(0);
-                        setLastPauseTime(null);
+                let newErrors = 0;
+                for (let i = input.length; i < newInput.length; i++) {
+                    if (newInput[i] !== text[i]) {
+                        newErrors++;
+                        const expected = text[i];
                         setStats(prev => ({
                             ...prev,
-                            completedTexts: prev.completedTexts + 1
+                            errorMap: {
+                                ...prev.errorMap,
+                                [expected]: (prev.errorMap[expected] || 0) + 1
+                            }
                         }));
-                    }, 1500);
+                    }
+                }
+
+                if (newInput.length > input.length) {
+                    const timeElapsed = (Date.now() - startTime) / 1000 / 60;
+                    const currentWPM = startTime ? Math.round((newInput.length / 5) / timeElapsed) : 0;
+                    
+                    setStats(prev => ({
+                        ...prev,
+                        keystrokes: prev.keystrokes + (newInput.length - input.length),
+                        errors: prev.errors + newErrors,
+                        wpm: currentWPM,
+                        wpmHistory: currentWPM > 0 ? [...prev.wpmHistory, { time: timeElapsed, wpm: currentWPM }] : prev.wpmHistory
+                    }));
+                }
+
+                setInput(newInput);
+
+                if (newInput === text) {
+                    setShowEffect(true);
+                    setTimeout(() => {
+                        setShowEffect(false);
+                        setInput('');
+                        setText(texts[Math.floor(Math.random() * texts.length)]);
+                        setStartTime(Date.now());
+                        setStats(prev => ({ ...prev, completed: prev.completed + 1 }));
+                    }, 800);
                 }
             };
 
-            const togglePause = () => {
-                setIsPaused(prev => {
-                    if (!prev) {
-                        setLastPauseTime(Date.now());
-                    } else {
-                        setPausedTime(prev => prev + (Date.now() - lastPauseTime));
-                        setLastPauseTime(null);
-                    }
-                    return !prev;
-                });
+            const handleFinish = () => {
+                setIsFinished(true);
+                setShowStats(true);
             };
 
-            const reset = () => {
-                setUserInput('');
-                setCurrentText(generateRandomText());
+            const handleReset = () => {
+                setInput('');
+                setText(texts[Math.floor(Math.random() * texts.length)]);
                 setStartTime(null);
-                setPausedTime(0);
-                setLastPauseTime(null);
-                setIsPaused(false);
-                setShowMatrix(false);
+                setIsFinished(false);
+                setShowStats(false);
                 setStats({
                     wpm: 0,
-                    accuracy: 100,
                     errors: 0,
-                    completedTexts: 0
+                    keystrokes: 0,
+                    completed: 0,
+                    wpmHistory: [],
+                    errorMap: {}
                 });
             };
 
-            const renderText = () => {
-                const parts = [];
-                for (let i = 0; i < Math.max(currentText.length, userInput.length); i++) {
-                    if (i < userInput.length) {
-                        if (currentText[i] === userInput[i]) {
-                            parts.push(<span key={i} className="text-green-600">{currentText[i]}</span>);
-                        } else {
-                            parts.push(
-                                <span key={i} className="text-red-600 bg-red-100">
-                                    {currentText[i] || ' '}
-                                </span>
+            const WPMGraph = () => {
+                if (stats.wpmHistory.length < 2) return <div className="text-gray-500">Need more data...</div>;
+
+                const maxWPM = Math.max(...stats.wpmHistory.map(p => p.wpm));
+                const gridLines = 5;
+
+                return (
+                    <div className="relative h-[200px] w-full border-l border-b border-gray-300">
+                        {/* Y-axis labels and grid lines */}
+                        {[...Array(gridLines + 1)].map((_, i) => {
+                            const wpm = Math.round((maxWPM * (gridLines - i)) / gridLines);
+                            return (
+                                <div key={i} className="absolute w-full" style={{ top: `${(i * 100) / gridLines}%` }}>
+                                    <div className="absolute right-full px-2 text-sm text-gray-600" style={{ transform: 'translateY(-50%)' }}>
+                                        {wpm}
+                                    </div>
+                                    <div className="w-full border-t border-gray-100" />
+                                </div>
                             );
-                        }
-                    } else {
-                        parts.push(<span key={i}>{currentText[i]}</span>);
-                    }
-                }
-                return parts;
+                        })}
+
+                        {/* WPM line */}
+                        <svg className="absolute inset-0" style={{ overflow: 'visible' }}>
+                            <polyline
+                                points={stats.wpmHistory.map((point, i) => {
+                                    const x = (i / (stats.wpmHistory.length - 1)) * 100;
+                                    const y = 100 - (point.wpm / maxWPM) * 100;
+                                    return `${x},${y}`;
+                                }).join(' ')}
+                                fill="none"
+                                stroke="#4f46e5"
+                                strokeWidth="2"
+                            />
+                        </svg>
+
+                        {/* X-axis labels */}
+                        <div className="absolute w-full" style={{ top: '100%' }}>
+                            {[0, stats.wpmHistory.length - 1].map((i) => (
+                                <div key={i} 
+                                     className="absolute text-sm text-gray-600"
+                                     style={{ 
+                                         left: `${(i / (stats.wpmHistory.length - 1)) * 100}%`,
+                                         transform: 'translateX(-50%)'
+                                     }}>
+                                    {Math.round(stats.wpmHistory[i].time * 60)}s
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Axis labels */}
+                        <div className="absolute -left-8 top-1/2 -rotate-90 text-sm text-gray-600">WPM</div>
+                        <div className="absolute bottom-[-25px] right-1/2 text-sm text-gray-600">Time (seconds)</div>
+                    </div>
+                );
             };
 
-            // Calculate progress percentage
-            const progress = (userInput.length / currentText.length) * 100;
-
-            return (
-                <div>
-                    {/* Compact Stats Bar - Mobile Responsive */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm mb-2 gap-2">
-                        <div className="flex flex-wrap gap-4">
-                            <span>WPM: <strong>{stats.wpm}</strong></span>
-                            <span>Accuracy: <strong>{stats.accuracy}%</strong></span>
-                            <span>Errors: <strong>{stats.errors}</strong></span>
+            const StatsModal = () => !showStats ? null : (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 className="font-bold mb-2">Overview</h3>
+                                <p>WPM: {stats.wpm}</p>
+                                <p>Accuracy: {((stats.keystrokes - stats.errors) / stats.keystrokes * 100 || 100).toFixed(1)}%</p>
+                                <p>Texts Completed: {stats.completed}</p>
+                                <p>Total Keystrokes: {stats.keystrokes}</p>
+                                <p>Total Errors: {stats.errors}</p>
+                            </div>
+                            
+                            <div>
+                                <h3 className="font-bold mb-2">WPM Progress</h3>
+                                <WPMGraph />
+                            </div>
+                            
+                            <div className="col-span-2">
+                                <h3 className="font-bold mb-2">Most Common Errors</h3>
+                                <div className="grid grid-cols-10 gap-1">
+                                    {Object.entries(stats.errorMap)
+                                        .sort(([,a], [,b]) => b - a)
+                                        .slice(0, 10)
+                                        .map(([char, count]) => (
+                                            <div key={char} 
+                                                 className="p-2 text-center border rounded"
+                                                 style={{
+                                                     backgroundColor: `rgba(255,0,0,${count / Math.max(...Object.values(stats.errorMap)) * 0.5})`
+                                                 }}>
+                                                {char}: {count}
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={togglePause}
-                                className="px-4 py-2 sm:px-2 sm:py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-sm"
-                            >
-                                {isPaused ? 'Resume' : 'Pause'}
+                        <div className="mt-4 flex gap-2">
+                            <button onClick={() => setShowStats(false)}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                Close
                             </button>
-                            <button
-                                onClick={reset}
-                                className="px-4 py-2 sm:px-2 sm:py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-base sm:text-sm"
-                            >
-                                Reset
+                            <button onClick={handleReset}
+                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                                Start New Session
                             </button>
                         </div>
                     </div>
+                </div>
+            );
 
+            return (
+                <div className="bg-white p-6 rounded-lg shadow-lg">
                     {/* Progress Bar */}
-                    <div className="h-1 bg-gray-200 rounded mb-2">
+                    <div className="progress-bar mb-4">
                         <div 
-                            className="h-full bg-blue-500 rounded transition-all duration-200"
-                            style={{ width: `${progress}%` }}
+                            className="progress-fill"
+                            style={{ width: `${calculateProgress()}%` }}
                         />
                     </div>
 
-                    {/* Text Display Area */}
-                    <div className="relative mb-2 p-3 bg-gray-50 rounded text-base sm:text-lg">
-                        <p className="font-mono leading-relaxed">
-                            {renderText()}
-                        </p>
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="space-x-4">
+                            <span>WPM: <strong>{stats.wpm}</strong></span>
+                            <span>Accuracy: <strong>{((stats.keystrokes - stats.errors) / stats.keystrokes * 100 || 100).toFixed(1)}%</strong></span>
+                            <span>Completed: <strong>{stats.completed}</strong></span>
+                        </div>
+                        <div className="space-x-2">
+                            <button 
+                                onClick={handleReset}
+                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                            >
+                                Reset
+                            </button>
+                            <button 
+                                onClick={handleFinish}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Finish
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Input Area - Mobile Responsive */}
-                    <textarea
-                        value={userInput}
-                        onChange={handleInput}
-                        disabled={isPaused}
-                        className={`w-full p-3 border rounded font-mono text-base sm:text-lg ${
-                            isPaused ? 'bg-gray-100' : ''
-                        }`}
-                        rows={3}
-                        autoFocus
-                    />
+                    <div className="relative font-mono text-lg bg-gray-50 p-4 rounded mb-4 text-area">
+                        <div className="text-gray-800 mb-2">Type this text:</div>
+                        <div>
+                            {text.split('').map((char, i) => (
+                                <span key={i} className={
+                                    i >= input.length ? 'text-gray-700' :
+                                    input[i] === char ? 'text-green-600 font-bold' : 'text-red-600 bg-red-100'
+                                }>
+                                    {char}
+                                </span>
+                            ))}
+                        </div>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={handleInput}
+                            disabled={isFinished}
+                            className="absolute inset-0 w-full h-full opacity-0 p-4"
+                            autoFocus
+                        />
+                    </div>
 
-                    {/* Matrix Effect */}
-                    {showMatrix && (
-                        <div className="fixed inset-0 z-50" style={{ perspective: '1000px' }}>
-                            <div 
-                                className="absolute inset-0 bg-green-500"
-                                style={{ 
-                                    animation: 'flash 1s linear forwards',
-                                    opacity: 0
-                                }}
-                            />
-                            
-                            {[...Array(50)].map((_, i) => (
+                    {showEffect && (
+                        <div className="fixed inset-0 z-40">
+                            {[...Array(100)].map((_, i) => (
                                 <div
                                     key={i}
                                     className="matrix-rain"
                                     style={{
-                                        left: `${(i * 2)}%`,
+                                        left: `${(i * 1)}%`,
                                         height: '200%',
                                         opacity: Math.random() * 0.5 + 0.5,
-                                        animation: `matrixRain ${1 + Math.random() * 0.5}s linear forwards`,
-                                        animationDelay: `${Math.random() * 0.5}s`
+                                        animationDelay: `${Math.random() * 0.3}s`
                                     }}
                                 />
                             ))}
 
-                            {[...Array(100)].map((_, i) => (
+                            {[...Array(200)].map((_, i) => (
                                 <div
                                     key={`char-${i}`}
                                     className="matrix-char"
                                     style={{
                                         left: `${Math.random() * 100}%`,
                                         top: `${Math.random() * 100}%`,
-                                        transform: 'scale(1.5)'
+                                        animationDelay: `${Math.random() * 0.5}s`
                                     }}
                                 >
                                     {String.fromCharCode(0x30A0 + Math.random() * 96)}
@@ -381,17 +413,12 @@
                         </div>
                     )}
 
-                    {isPaused && (
-                        <div className="mt-1 text-xs text-blue-600">
-                            Paused - press Resume to continue
-                        </div>
-                    )}
+                    <StatsModal />
                 </div>
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<TypingTutor />);
+        ReactDOM.createRoot(document.getElementById('root')).render(<TypingTutor />);
     </script>
 </body>
 </html>
