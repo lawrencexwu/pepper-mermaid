@@ -165,7 +165,7 @@
             const handleInput = (e) => {
                 if (isFinished) return;
                 
-                const newInput = e.target.value;
+                const newInput = e.target.value.replace(/'/g, "'");
                 if (!startTime && newInput) setStartTime(Date.now());
 
                 let newErrors = 0;
