@@ -64,6 +64,16 @@
             background: #4f46e5;
             transition: width 0.2s ease-out;
         }
+
+        @media (max-width: 640px) {
+            .text-area {
+                font-size: 14px;
+                min-height: 80px;
+            }
+            .matrix-char {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -119,28 +129,28 @@
                 "Why did the programmer quit his job? He didn't get arrays.",
                 "The code was perfect, said no one ever.",
                 "In a world of AI, the human touch still debugs the bugs.",
-		"The only thing worse than a bug is a bug that works.",
-		"I told my computer to go to sleep, but it wanted to update first.",
-		"The best thing about boolean jokes? Even if they're bad, they're still true.",
-		"There are 10 types of people in this world: those who understand binary and those who don't.",
-		"Real programmers count from zero, except on their fingers.",
-		"Git commit -m 'Fixed bugs' ... Git push ... Prayer mode activated.",
-		"Documentation is like true love - it exists, but it's hard to find.",
-		"The coffee machine is broken. Programmer productivity drops to zero.",
-		"Debugging is like being the detective in a crime movie where you're also the murderer.",
-		"A SQL query walks into a bar, sees two tables, and asks, 'Can I join you?'",
-		"The best way to predict the future is to implement it.",
-		"Keep calm and blame it on the cache.",
-		"Keyboard not found. Press F1 to continue, or F2 to quit.",
-		"Life is short, use Python (unless you need speed, then use C++).",
-		"The problem with troubleshooting is that real trouble shoots back.",
-		"Always code as if the person who ends up maintaining your code is a violent psychopath who knows where you live.",
-		"If debugging is the process of removing bugs, then programming must be the process of adding them.",
-		"Never trust a computer you can't throw out a window.",
-		"To understand recursion, you must first understand recursion.",
-		"The best performance improvement is choosing the right algorithm.",
-		"In theory, there is no difference between theory and practice. In practice, there is.",
-		"The more I C, the less I see."
+                "The only thing worse than a bug is a bug that works.",
+                "I told my computer to go to sleep, but it wanted to update first.",
+                "The best thing about boolean jokes? Even if they're bad, they're still true.",
+                "There are 10 types of people in this world: those who understand binary and those who don't.",
+                "Real programmers count from zero, except on their fingers.",
+                "Git commit -m 'Fixed bugs' ... Git push ... Prayer mode activated.",
+                "Documentation is like true love - it exists, but it's hard to find.",
+                "The coffee machine is broken. Programmer productivity drops to zero.",
+                "Debugging is like being the detective in a crime movie where you're also the murderer.",
+                "A SQL query walks into a bar, sees two tables, and asks, 'Can I join you?'",
+                "The best way to predict the future is to implement it.",
+                "Keep calm and blame it on the cache.",
+                "Keyboard not found. Press F1 to continue, or F2 to quit.",
+                "Life is short, use Python (unless you need speed, then use C++).",
+                "The problem with troubleshooting is that real trouble shoots back.",
+                "Always code as if the person who ends up maintaining your code is a violent psychopath who knows where you live.",
+                "If debugging is the process of removing bugs, then programming must be the process of adding them.",
+                "Never trust a computer you can't throw out a window.",
+                "To understand recursion, you must first understand recursion.",
+                "The best performance improvement is choosing the right algorithm.",
+                "In theory, there is no difference between theory and practice. In practice, there is.",
+                "The more I C, the less I see."
             ];
 
             React.useEffect(() => {
@@ -365,6 +375,7 @@
                         <div>
                             {text.split('').map((char, i) => (
                                 <span key={i} className={
+                                    i === input.length ? 'bg-blue-200 text-blue-900 font-bold' :
                                     i >= input.length ? 'text-gray-700' :
                                     input[i] === char ? 'text-green-600 font-bold' : 'text-red-600 bg-red-100'
                                 }>
